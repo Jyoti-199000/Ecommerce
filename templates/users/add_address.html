@@ -1,0 +1,33 @@
+<form method="post">
+    {% csrf_token %}
+    <input name="full_name" placeholder="Full Name" required>
+    <input name="phone" placeholder="Phone" required>
+    <input name="address_line1" placeholder="Address" required>
+    <input name="city" placeholder="City" required>
+    <input name="state" placeholder="State" required>
+    <input name="pincode" placeholder="Pincode" required>
+    <button type="submit">Save Address</button>
+</form>
+<style>
+    form {
+        max-width: 400px;
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    input {
+        margin-bottom: 10px;
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    button {
+        background: #2874f0;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+</style>

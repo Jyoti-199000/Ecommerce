@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - LuxeStore{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .profile-sidebar {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        height: fit-content;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        display: block;
+    }
+    
+    .profile-name {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-email {
+        text-align: center;
+        color: var(--grey);
+        margin-bottom: 2rem;
+    }
+    
+    .profile-menu {
+        list-style: none;
+    }
+    
+    .profile-menu li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-menu a {
+        display: block;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--dark);
+        transition: all 0.3s;
+    }
+    
+    .profile-menu a:hover,
+    .profile-menu a.active {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .profile-content {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .address-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .address-card {
+        border: 2px solid #E9ECEF;
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+    }
+    
+    .address-card.default {
+        border-color: var(--primary);
+    }
+    
+    .default-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--primary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .address-name {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .address-details {
+        color: var(--grey);
+        line-height: 1.8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-container">
+        <div class="profile-sidebar">
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture }}" alt="{{ user.get_full_name }}" class="profile-pic">
+            {% else %}
+            <div class="profile-pic" style="background: var(--primary); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 600;">
+                {{ user.username.0|upper }}
+            </div>
+            {% endif %}
+            
+            <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+            <div class="profile-email">{{ user.email }}</div>
+            
+            <ul class="profile-menu">
+                <li><a href="{% url 'users:profile' %}" class="active">My Addresses</a></li>
+                <li><a href="{% url 'orders:order_list' %}">My Orders</a></li>
+                <li><a href="{% url 'users:logout' %}">Logout</a></li>
+            </ul>
+        </div>
+        
+        <div class="profile-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 class="section-title" style="margin: 0;">My Addresses</h2>
+                <a href="{% url 'users:add_address' %}" class="btn btn-primary">+ Add New Address</a>
+            </div>
+            
+            {% if addresses %}
+            <div class="address-grid">
+                {% for address in addresses %}
+                <div class="address-card {% if address.is_default %}default{% endif %}">
+                    {% if address.is_default %}
+                    <span class="default-badge">Default</span>
+                    {% endif %}
+                    
+                    <div class="address-name">{{ address.full_name }}</div>
+                    <div class="address-details">
+                        {{ address.address_line1 }}<br>
+                        {% if address.address_line2 %}{{ address.address_line2 }}<br>{% endif %}
+                        {{ address.city }}, {{ address.state }} {{ address.pincode }}<br>
+                        <strong>Phone:</strong> {{ address.phone }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 3rem; color: var(--grey);">
+                <i class="fas fa-map-marker-alt" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+                <p>No addresses added yet</p>
+                <a href="{% url 'users:add_address' %}" class="btn btn-primary" style="margin-top: 1rem;">Add Your First Address</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

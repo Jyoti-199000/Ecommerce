@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+
+{% block title %}LuxeStore - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, #97BC62 0%, #2C5F2D 100%);
+        padding: 6rem 2rem;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero::before {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        top: -250px;
+        right: -100px;
+    }
+    
+    .hero h1 {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .hero p {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+        margin: 4rem 0 2rem;
+        text-align: center;
+    }
+    
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .category-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+    
+    .category-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .category-info {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .category-info h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        background: #F8F9FA;
+    }
+    
+    .discount-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--accent);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    
+    .product-info {
+        padding: 1.5rem;
+    }
+    
+    .product-category {
+        color: var(--grey);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .stars {
+        color: #FFC107;
+    }
+    
+    .product-price {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .current-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    .original-price {
+        font-size: 1.2rem;
+        text-decoration: line-through;
+        color: var(--grey);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Discover Your Style</h1>
+    <p>Premium products curated just for you. Shop with confidence.</p>
+    <a href="{% url 'products:product_list' %}" class="btn btn-accent" style="font-size: 1.1rem; padding: 1rem 3rem;">Shop Now</a>
+</div>
+
+<div class="container">
+    {% if categories %}
+    <h2 class="section-title">Shop by Category</h2>
+    <div class="categories-grid">
+        {% for category in categories %}
+        <a href="{% url 'products:category_products' category.slug %}" class="category-card">
+            {% if category.image %}
+            <img src="{{ category.image }}" alt="{{ category.name }}">
+            {% else %}
+            <div style="height: 200px; background: linear-gradient(135deg, #97BC62, #2C5F2D); display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-tag" style="font-size: 4rem; color: white; opacity: 0.3;"></i>
+            </div>
+            {% endif %}
+            <div class="category-info">
+                <h3>{{ category.name }}</h3>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if featured_products %}
+    <h2 class="section-title">Featured Products</h2>
+    <div class="products-grid">
+        {% for product in featured_products %}
+        <a href="{% url 'products:product_detail' product.slug %}" class="product-card">
+            {% if product.discount_percentage > 0 %}
+            <span class="discount-badge">-{{ product.discount_percentage }}%</span>
+            {% endif %}
+            
+            {% if product.images.first %}
+            <img src="{{ product.images.first.image_url }}" alt="{{ product.name }}" class="product-image">
+            {% else %}
+            <div class="product-image" style="display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-image" style="font-size: 4rem; color: #dee2e6;"></i>
+            </div>
+            {% endif %}
+            
+            <div class="product-info">
+                <div class="product-category">{{ product.category.name }}</div>
+                <h3 class="product-name">{{ product.name }}</h3>
+                
+                {% if product.rating > 0 %}
+                <div class="product-rating">
+                    <span class="stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= product.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span>({{ product.review_count }})</span>
+                </div>
+                {% endif %}
+                
+                <div class="product-price">
+                    <span class="current-price">${{ product.price }}</span>
+                    {% if product.original_price %}
+                    <span class="original-price">${{ product.original_price }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    {% if new_arrivals %}
+    <h2 class="section-title">New Arrivals</h2>
+    <div class="products-grid">
+        {% for product in new_arrivals %}
+        <a href="{% url 'products:product_detail' product.slug %}" class="product-card">
+            {% if product.discount_percentage > 0 %}
+            <span class="discount-badge">-{{ product.discount_percentage }}%</span>
+            {% endif %}
+            
+            {% if product.images.first %}
+            <img src="{{ product.images.first.image_url }}" alt="{{ product.name }}" class="product-image">
+            {% else %}
+            <div class="product-image" style="display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-image" style="font-size: 4rem; color: #dee2e6;"></i>
+            </div>
+            {% endif %}
+            
+            <div class="product-info">
+                <div class="product-category">{{ product.category.name }}</div>
+                <h3 class="product-name">{{ product.name }}</h3>
+                
+                {% if product.rating > 0 %}
+                <div class="product-rating">
+                    <span class="stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= product.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span>({{ product.review_count }})</span>
+                </div>
+                {% endif %}
+                
+                <div class="product-price">
+                    <span class="current-price">${{ product.price }}</span>
+                    {% if product.original_price %}
+                    <span class="original-price">${{ product.original_price }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+
+    <h2>Order Details</h2>
+
+    <p><strong>Order ID:</strong> {{ order.order_id }}</p>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+    <p><strong>Payment Status:</strong> {{ order.payment_status }}</p>
+    <p><strong>Total Amount:</strong> ₹{{ order.total_amount }}</p>
+
+    <hr>
+
+    <h4>Shipping Address</h4>
+    <p>
+        {{ order.shipping_address.full_name }}<br>
+        {{ order.shipping_address.address_line1 }}<br>
+        {{ order.shipping_address.city }},
+        {{ order.shipping_address.state }} -
+        {{ order.shipping_address.pincode }}<br>
+        Phone: {{ order.shipping_address.phone }}
+    </p>
+
+    <hr>
+
+    <h4>Items</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if order.payment_status == "pending" %}
+        <button id="pay-btn" class="pay-btn">
+            Pay Now
+        </button>
+    {% else %}
+        <p class="paid-msg">✅ Payment Completed</p>
+    {% endif %}
+
+</div>
+
+<style>
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+th {
+    background: #f5f5f5;
+}
+
+.pay-btn {
+    margin-top: 25px;
+    background: #28a745;
+    color: #fff;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 6px;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.pay-btn:hover {
+    background: #218838;
+}
+
+.paid-msg {
+    margin-top: 20px;
+    font-size: 18px;
+    color: green;
+    font-weight: bold;
+}
+</style>
+
+{% if order.payment_status == "pending" %}
+<script>
+document.getElementById("pay-btn").addEventListener("click", async () => {
+    try {
+        const response = await fetch("/api/payments/v1/checkout/session/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                order_id: "{{ order.order_id }}"
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            alert(data.error || "Stripe error");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Network error");
+    }
+});
+</script>
+
+{% endif %}
+
+{% endblock %}

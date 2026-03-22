@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% block title %}All Products - LuxeStore{% endblock %}
+
+{% block extra_css %}
+<style>
+    .products-page {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .filters-sidebar {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        height: fit-content;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .filters-sidebar h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #E9ECEF;
+    }
+    
+    .filter-group {
+        margin-bottom: 2rem;
+    }
+    
+    .filter-group h4 {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        color: var(--grey);
+    }
+    
+    .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background 0.3s;
+        text-decoration: none;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-option:hover {
+        background: #F8F9FA;
+    }
+    
+    .filter-option.active {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .products-section {
+        min-height: 60vh;
+    }
+    
+    .products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        background: white;
+        padding: 1.5rem 2rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .products-header h1 {
+        font-size: 2rem;
+        margin: 0;
+    }
+    
+    .sort-dropdown {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .sort-dropdown select {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid #E9ECEF;
+        border-radius: 50px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        background: white;
+        transition: border-color 0.3s;
+    }
+    
+    .sort-dropdown select:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        text-decoration: none;
+        color: inherit;
+        position: relative;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        background: #F8F9FA;
+    }
+    
+    .discount-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: var(--accent);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    
+    .product-info {
+        padding: 1.5rem;
+    }
+    
+    .product-category {
+        color: var(--grey);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .stars {
+        color: #FFC107;
+    }
+    
+    .product-price {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .current-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+    
+    .original-price {
+        font-size: 1.2rem;
+        text-decoration: line-through;
+        color: var(--grey);
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 3rem;
+    }
+    
+    .pagination a,
+    .pagination span {
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--dark);
+        background: white;
+        border: 2px solid #E9ECEF;
+        transition: all 0.3s;
+    }
+    
+    .pagination a:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    .pagination .current {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+    
+    .no-products {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+    
+    .no-products i {
+        font-size: 5rem;
+        color: #E9ECEF;
+        margin-bottom: 1rem;
+    }
+    
+    .no-products h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .no-products p {
+        color: var(--grey);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="products-page">
+        <aside class="filters-sidebar">
+            <h3>Filters</h3>
+            
+            <div class="filter-group">
+                <h4>Categories</h4>
+                <a href="{% url 'products:product_list' %}" class="filter-option {% if not current_category %}active{% endif %}">
+                    <i class="fas fa-th"></i> All Products
+                </a>
+                {% for category in categories %}
+                <a href="{% url 'products:category_products' category.slug %}" class="filter-option {% if current_category == category.slug %}active{% endif %}">
+                    <i class="fas fa-tag"></i> {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+            
+            <div class="filter-group">
+                <h4>Sort By</h4>
+                <form method="GET" action="" id="sortForm">
+                    <select name="sort" onchange="document.getElementById('sortForm').submit()" class="filter-option" style="width: 100%; cursor: pointer;">
+                        <option value="-created_at" {% if request.GET.sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                        <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="-price" {% if request.GET.sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="-rating" {% if request.GET.sort == '-rating' %}selected{% endif %}>Top Rated</option>
+                        <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name: A to Z</option>
+                    </select>
+                </form>
+            </div>
+        </aside>
+        
+        <div class="products-section">
+            <div class="products-header">
+                <div>
+                    <h1>All Products</h1>
+                    <p style="color: var(--grey); margin: 0.5rem 0 0 0;">{{ page_obj.paginator.count }} products found</p>
+                </div>
+            </div>
+            
+            {% if page_obj %}
+            <div class="products-grid">
+                {% for product in page_obj %}
+                <a href="{% url 'products:product_detail' product.slug %}" class="product-card" data-testid="product-card-{{ product.slug }}">
+                    {% if product.discount_percentage > 0 %}
+                    <span class="discount-badge">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                    
+                    {% if product.images.first %}
+                    <img src="{{ product.images.first.image_url }}" alt="{{ product.name }}" class="product-image">
+                    {% else %}
+                    <div class="product-image" style="display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image" style="font-size: 4rem; color: #dee2e6;"></i>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="product-info">
+                        <div class="product-category">{{ product.category.name }}</div>
+                        <h3 class="product-name">{{ product.name }}</h3>
+                        
+                        {% if product.rating > 0 %}
+                        <div class="product-rating">
+                            <span class="stars">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= product.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span>({{ product.review_count }})</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="product-price">
+                            <span class="current-price">${{ product.price }}</span>
+                            {% if product.original_price %}
+                            <span class="original-price">${{ product.original_price }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            
+            {% if page_obj.has_other_pages %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">&lsaquo; Prev</a>
+                {% endif %}
+                
+                <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">Next &rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if current_category %}&category={{ current_category }}{% endif %}">Last &raquo;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="no-products">
+                <i class="fas fa-box-open"></i>
+                <h3>No Products Found</h3>
+                <p>Try adjusting your filters or search criteria</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>Checkout</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <h4>Delivery Address</h4>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if addresses %}
+            {% for address in addresses %}
+                <div class="address-card">
+                    <label>
+                        <input type="radio" name="address_id" value="{{ address.id }}">
+                        <strong>{{ address.full_name }}</strong><br>
+                        {{ address.address_line1 }},
+                        {{ address.city }},
+                        {{ address.state }} - {{ address.pincode }}<br>
+                        Phone: {{ address.phone }}
+                    </label>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No address found. Please add one.</p>
+        {% endif %}
+
+        <hr>
+
+        <h4>Order Summary</h4>
+        <ul>
+            {% for item in cart.items.all %}
+                <li>
+                    {{ item.product.name }} × {{ item.quantity }}
+                    <span style="float:right;">₹{{ item.subtotal }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <hr>
+
+        <h3>Total: ₹{{ cart.total_price }}</h3>
+
+        <button type="submit" class="btn btn-primary">Place Order</button>
+    </form>
+</div>
+
+<style>
+.container { max-width: 800px; margin: auto; padding: 20px; }
+.address-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.btn { padding: 10px 20px; }
+</style>
+{% endblock %}
